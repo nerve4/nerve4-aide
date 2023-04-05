@@ -1,0 +1,12 @@
+---
+# tasks - install_el7.yml for nerve4-aide
+
+- name: Install aide on RHEL7 based hosts
+  ansible.builtin.yum: 
+    name: "aide"
+    state: present
+
+- name: Initialize AIDE
+  become: true
+  ansible.builtin.command: 
+    cmd: /usr/sbin/aide --init

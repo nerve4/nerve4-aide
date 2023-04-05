@@ -1,0 +1,30 @@
+---
+# tasks - configure_aide.yml for nerve4-aide
+
+- name: Stat aide.db.new.gz
+  ansible.builtin.stat: 
+    path=/var/lib/aide/aide.db.new.gz
+  register: aide_stat
+
+- name: Move aide.db.new.gz to /var/lib/aide/
+  become: true
+  ansible.builtin.command: 
+    cmd: mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  when: aide_stat.stat.exists
+
+- name: Copy aide.j2 to remote host
+  ansible.builtin.template:
+    src: templates/aide.conf.j2
+    dest: /etc/aide.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Automate AIDE check with Cron
+  ansible.builtin.cron:
+    name: "aide check"
+    weekday: "{{ aide_cron_day }}"
+    minute: "{{ aide_cron_min }}"
+    hour: "{{ aide_cron_hour }}"
+    user: "root"
+    job: "root /usr/sbin/aide --check"
