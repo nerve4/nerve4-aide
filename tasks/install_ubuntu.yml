@@ -1,0 +1,13 @@
+---
+# tasks - install_ubuntu.yml for nerve4-aide
+
+- name: Install aide on Ubuntu based hosts
+  ansible.builtin.apt: 
+    name: "aide"
+    state: present
+
+- name: Initialize AIDE
+  become: true
+  become_user: "{{ aide_admin_user }}"
+  ansible.builtin.command: 
+    cmd: sudo /usr/sbin/aideinit -y -f
